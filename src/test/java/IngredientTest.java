@@ -13,5 +13,12 @@ class IngredientTest {
         assertEquals(1.5f, ingredient.getPrice());
         assertEquals(IngredientType.FILLING, ingredient.getType());
     }
-}
 
+    @Test
+    void testIngredientSauce() {
+        Ingredient ingredient = new Ingredient(IngredientType.SAUCE, "Ketchup", 0.5f);
+        assertEquals("Ketchup", ingredient.getName());
+        assertEquals(0.5f, ingredient.getPrice());
+        assertEquals(IngredientType.SAUCE, ingredient.getType());
+    }
+}

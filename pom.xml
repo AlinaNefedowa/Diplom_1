@@ -48,6 +48,18 @@
                         <goals>
                             <goal>report</goal>
                         </goals>
+                        <configuration>
+                            <includes>
+                                <include>praktikum/Bun*</include>
+                                <include>praktikum/Burger*</include>
+                                <include>praktikum/Ingredient*</include>
+                                <include>praktikum/IngredientType*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>praktikum/Database*</exclude>
+                                <exclude>praktikum/Praktikum*</exclude>
+                            </excludes>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

@@ -7,8 +7,6 @@ import praktikum.Burger;
 import praktikum.Ingredient;
 import praktikum.IngredientType;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -32,28 +30,58 @@ class BurgerTest {
     }
 
     @Test
-    void testAddRemoveMoveIngredient() {
+    void testAddIngredient() {
         burger.addIngredient(ingredientMock);
         assertEquals(1, burger.ingredients.size());
-
-        burger.removeIngredient(0);
-        assertTrue(burger.ingredients.isEmpty());
-
-        burger.addIngredient(ingredientMock);
-        burger.addIngredient(mock(Ingredient.class));
-        burger.moveIngredient(0, 1);
-        assertEquals(ingredientMock, burger.ingredients.get(1));
     }
 
     @Test
-    void testGetPrice() {
+    void testRemoveIngredient() {
+        burger.addIngredient(ingredientMock);
+        burger.removeIngredient(0);
+        assertTrue(burger.ingredients.isEmpty());
+    }
+
+    @Test
+    void testMoveIngredient() {
+        Ingredient anotherIngredient = mock(Ingredient.class);
+        burger.addIngredient(ingredientMock);
+        burger.addIngredient(anotherIngredient);
+        burger.moveIngredient(0, 1);
+        assertEquals(ingredientMock, burger.ingredients.get(1));
+        assertEquals(anotherIngredient, burger.ingredients.get(0));
+    }
+
+    @Test
+    void testGetPriceSingleIngredient() {
         when(bunMock.getPrice()).thenReturn(2.0f);
         when(ingredientMock.getPrice()).thenReturn(1.5f);
-
         burger.setBuns(bunMock);
         burger.addIngredient(ingredientMock);
 
-        assertEquals(2*2.0f + 1.5f, burger.getPrice());
+        assertEquals(5.5f, burger.getPrice());
+    }
+
+    @Test
+    void testGetPriceNoIngredients() {
+        when(bunMock.getPrice()).thenReturn(2.0f);
+        burger.setBuns(bunMock);
+        assertEquals(4.0f, burger.getPrice());
+    }
+
+    @Test
+    void testGetPriceMultipleIngredients() {
+        when(bunMock.getPrice()).thenReturn(2.0f);
+        Ingredient ing1 = mock(Ingredient.class);
+        Ingredient ing2 = mock(Ingredient.class);
+        when(ing1.getPrice()).thenReturn(1.0f);
+        when(ing2.getPrice()).thenReturn(0.5f);
+
+        burger.setBuns(bunMock);
+        burger.addIngredient(ing1);
+        burger.addIngredient(ing2);
+
+        assertEquals(5.5f, burger.getPrice());
     }
 
     @Test
@@ -67,16 +95,19 @@ class BurgerTest {
         burger.setBuns(bunMock);
         burger.addIngredient(ingredientMock);
 
-        String receipt = burger.getReceipt();
-        assertTrue(receipt.contains("White Bun"));
+        String receipt = burger.getReceipt().toLowerCase();
+        assertTrue(receipt.contains("white bun"));
         assertTrue(receipt.contains("cheese"));
-        assertTrue(receipt.contains("Price: 5.5"));
+        assertTrue(receipt.contains("filling"));
+        assertTrue(receipt.contains("price: 5.5"));
     }
 
     @ParameterizedTest
     @CsvSource({
             "2.0, 1.5, 5.5",
-            "1.0, 2.0, 4.0"
+            "1.0, 2.0, 4.0",
+            "3.0, 0.5, 6.5",
+            "2.5, 0.0, 5.0"  // проверка без ингредиентов
     })
     void testGetPriceParameterized(float bunPrice, float ingredientPrice, float expected) {
         when(bunMock.getPrice()).thenReturn(bunPrice);
@@ -88,5 +119,15 @@ class BurgerTest {
 
         assertEquals(expected, burger.getPrice());
     }
-}
 
+    @Test
+    void testReceiptEmptyBurger() {
+        when(bunMock.getName()).thenReturn("Plain Bun");
+        when(bunMock.getPrice()).thenReturn(1.0f);
+        burger.setBuns(bunMock);
+
+        String receipt = burger.getReceipt().toLowerCase();
+        assertTrue(receipt.contains("plain bun"));
+        assertTrue(receipt.contains("price: 2.0"));
+    }
+}
